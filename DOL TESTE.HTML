@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D.O.L. Diagnóstico Operacional de Lançamentos</title>
+<link href="https://fonts.cdnfonts.com/css/aileron" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+  /* ── RESET & BASICS ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* Paleta Solicitada (Sem pretos/cinzas) */
+    --ouro: #947653;
+    --ouro-escuro: #5b3b03;
+    --ouro-claro: #ffe1a1;
+    
+    /* Fundos Quentes e Premium */
+    --bg-light: #f4efe9;      
+    --bg-white: #ffffff;      
+    --bg-badge: #faecd9;
+    
+    /* Textos Baseados Exclusivamente no Marrom/Ouro */
+    --text-main: #2e1d05;     
+    --text-muted: #6b4f31;    
+    --border-color: #dfceb8;  
+    
+    /* Alertas */
+    --red-dark: #8c2a1c;
+    --red-light: #fcedeb;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Aileron', sans-serif;
+    background: var(--bg-light);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── TIPOGRAFIA ── */
+  h1, h2, h3, .title-font {
+    font-family: 'Playfair Display', serif;
+    color: var(--ouro-escuro);
+  }
+  
+  em {
+    font-style: italic;
+    color: var(--ouro);
+  }
+
+  strong {
+    font-weight: 800;
+    color: var(--ouro-escuro);
+  }
+
+  /* ── TELAS ── */
+  .tela { display: none; min-height: 100vh; }
+  .tela.ativa { display: flex; flex-direction: column; animation: fadeIn 0.5s ease-out; }
+  
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── BOTÕES & TAGS ── */
+  .btn {
+    display: inline-flex; justify-content: center; align-items: center;
+    border: none; border-radius: 2px;
+    padding: 16px 32px;
+    font-family: 'Aileron', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--ouro-escuro); color: var(--ouro-claro);
+  }
+  .btn-primary:hover { background: var(--ouro); color: var(--bg-white); }
+  
+  .btn-outline {
+    background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted);
+  }
+  .btn-outline:hover { border-color: var(--ouro-escuro); color: var(--ouro-escuro); }
+
+  /* ── TELA 1: CAPTURA (ESTILO SCREENSHOT) ── */
+  #tela-captura {
+    background: var(--bg-light);
+    position: relative;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .grid-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background-image: 
+      linear-gradient(rgba(148, 118, 83, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 118, 83, 0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .captura-container {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    max-width: 900px; margin: 0 auto; padding: 80px 20px;
+    width: 100%;
+  }
+
+  .badge-gratuito {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-badge);
+    color: var(--ouro-escuro);
+    border: 1px solid #e8d5b5;
+    font-size: 14px; font-weight: 800;
+    padding: 10px 24px; border-radius: 40px;
+    margin-bottom: 40px;
+  }
+
+  .captura-titulo {
+    font-size: clamp(36px, 5vw, 60px); line-height: 1.15; margin-bottom: 32px; color: var(--text-main);
+  }
+
+  .captura-sub {
+    font-size: 20px; line-height: 1.6; color: var(--text-muted); margin-bottom: 48px; max-width: 800px;
+  }
+
+  .benefits-row {
+    display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 16px;
+    margin-bottom: 64px; width: 100%;
+  }
+  .benefit-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--bg-white); border: 1px solid var(--border-color);
+    padding: 14px 24px; border-radius: 40px;
+    font-size: 15px; font-weight: 800; color: var(--ouro-escuro);
+    box-shadow: 0 4px 12px rgba(148, 118, 83, 0.05);
+  }
+
+  .form-box {
+    background: var(--bg-white); border: 1px solid var(--border-color);
+    padding: 48px 40px; border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(91, 59, 3, 0.08);
+    width: 100%; max-width: 500px; text-align: left;
+  }
+  .form-box h3 { font-size: 24px; margin-bottom: 8px; text-align: center; color: var(--ouro-escuro); }
+  .form-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; text-align: center; }
+
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .input-group input {
+    width: 100%; background: var(--bg-light); border: 1px solid var(--border-color);
+    padding: 16px; color: var(--text-main); font-family: 'Aileron', sans-serif; font-size: 15px;
+    transition: all 0.2s; border-radius: 2px; outline: none;
+  }
+  .input-group input:focus { border-color: var(--ouro); box-shadow: 0 0 0 1px var(--ouro); background: var(--bg-white); }
+  .input-group input::placeholder { color: #d4c5b6; }
+  
+  .form-box .btn { width: 100%; margin-top: 10px; }
+  .form-security { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 20px; line-height: 1.5; }
+
+  /* ── TELA 2: QUIZ ── */
+  #tela-quiz { background: var(--bg-light); }
+  
+  .header-bar {
+    background: var(--bg-white); border-bottom: 1px solid var(--border-color);
+    padding: 20px 40px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--ouro-escuro); font-weight: 700; letter-spacing: 2px;}
+  .logo span { color: var(--ouro); }
+  
+  .progress-container { display: flex; align-items: center; gap: 16px; }
+  .progress-text { font-size: 12px; font-weight: 700; color: var(--ouro-escuro); text-transform: uppercase; letter-spacing: 0.1em; }
+  .progress-track { width: 200px; height: 2px; background: var(--border-color); }
+  .progress-bar { height: 100%; background: var(--ouro-escuro); transition: width 0.3s ease; }
+
+  .quiz-container { max-width: 800px; margin: 60px auto; padding: 0 20px; flex: 1; }
+  
+  .fase-indicator { color: var(--ouro-escuro); margin-bottom: 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;}
+  .quiz-instrucao { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; font-style: italic; }
+  .quiz-title { font-size: 32px; margin-bottom: 40px; line-height: 1.2; color: var(--ouro-escuro); }
+
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+  }
+
+  .options-grid { display: flex; flex-direction: column; gap: 12px; }
+  .option-card {
+    background: var(--bg-white); border: 1px solid var(--border-color);
+    padding: 16px 20px; display: flex; gap: 16px; align-items: flex-start;
+    cursor: pointer; transition: all 0.2s; border-radius: 2px;
+  }
+  .option-card:hover { border-color: var(--ouro); box-shadow: 0 4px 12px rgba(148, 118, 83, 0.05); }
+  .option-card.selected { border-color: var(--ouro-escuro); background: var(--bg-badge); }
+  
+  .checkbox {
+    width: 20px; height: 20px; border: 1px solid var(--text-muted); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+    border-radius: 1px; transition: all 0.2s; background: var(--bg-white);
+  }
+  .option-card.selected .checkbox { background: var(--ouro-escuro); border-color: var(--ouro-escuro); }
+  .checkbox svg { width: 12px; height: 12px; fill: none; stroke: var(--bg-white); stroke-width: 2; opacity: 0; }
+  .option-card.selected .checkbox svg { opacity: 1; }
+
+  .option-text { font-size: 15px; line-height: 1.5; color: var(--text-main); }
+
+  .quiz-footer {
+    display: flex; justify-content: space-between; margin-top: 48px;
+    padding-top: 32px; border-top: 1px solid var(--border-color);
+  }
+
+  /* ── TELA 3: LOADING ── */
+  #tela-loading { align-items: center; justify-content: center; text-align: center; background: var(--bg-light); }
+  .spinner {
+    width: 60px; height: 60px; border: 2px solid var(--border-color);
+    border-top-color: var(--ouro-escuro); border-radius: 50%;
+    animation: spin 1s linear infinite; margin-bottom: 32px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #tela-loading h2 { font-size: 28px; margin-bottom: 16px; color: var(--ouro-escuro); }
+  #tela-loading p { color: var(--text-muted); font-size: 16px; max-width: 500px; line-height: 1.6; margin: 0 auto; }
+
+  /* ── TELA 4: RESULTADO (RELATÓRIO EXECUTIVO) ── */
+  #tela-resultado { background: var(--bg-light); }
+  
+  .report-container { max-width: 900px; margin: 40px auto 80px; padding: 0 20px; width: 100%; }
+
+  .report-header { text-align: center; margin-bottom: 60px; }
+  .report-header .tag { font-size: 12px; font-weight: 700; color: var(--ouro-escuro); margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .report-header h1 { font-size: 40px; margin-bottom: 20px; line-height: 1.1; color: var(--text-main); }
+  .report-header p { font-size: 16px; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+  /* Dashboard Cards */
+  .dashboard-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 40px; }
+  .dash-card {
+    background: var(--bg-white); border: 1px solid var(--border-color); padding: 32px 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    text-align: center; border-radius: 4px;
+  }
+  .dash-card-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin: 0; }
+  
+  .status-label { display: inline-block; padding: 6px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; border-radius: 40px; }
+  .status-otimo { background: #eef2eb; color: #2a4b2a; border: 1px solid #d4e0ce; }
+  .status-atencao { background: var(--bg-badge); color: var(--ouro-escuro); border: 1px solid var(--border-color); }
+  .status-critico { background: var(--red-light); color: var(--red-dark); border: 1px solid #f5d6d1; }
+
+  /* Veredito Geral */
+  .veredito-box {
+    background: var(--bg-white); border-left: 4px solid var(--ouro-escuro);
+    padding: 40px; margin-bottom: 60px; box-shadow: 0 10px 30px rgba(91, 59, 3, 0.04);
+  }
+  .veredito-box.critico { border-color: var(--red-dark); }
+  .veredito-box h2 { font-size: 24px; margin-bottom: 16px; color: var(--ouro-escuro); }
+  .veredito-box p { font-size: 16px; line-height: 1.7; color: var(--text-muted); }
+
+  /* Plano de Ação */
+  .action-plan-title { font-size: 28px; margin-bottom: 8px; color: var(--ouro-escuro); }
+  .action-plan-sub { font-size: 15px; color: var(--text-main); margin-bottom: 32px; line-height: 1.6; }
+
+  .fase-accordion { margin-bottom: 16px; background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 2px; }
+  .acc-header {
+    padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; user-select: none;
+  }
+  .acc-header-left { display: flex; align-items: center; gap: 16px; }
+  .acc-title { font-weight: 700; font-size: 16px; color: var(--text-main); }
+  
+  .acc-body { display: none; padding: 0 24px 24px; border-top: 1px solid var(--border-color); }
+  .fase-accordion.open .acc-body { display: block; }
+  
+  /* Estrutura de Reflexão e Passos */
+  .fase-reflexao {
+    background: var(--bg-light);
+    border-left: 3px solid var(--ouro-claro);
+    padding: 16px 20px;
+    margin-top: 12px;
+    margin-bottom: 24px;
+    border-radius: 0 4px 4px 0;
+  }
+  .fase-reflexao strong { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ouro-escuro); margin-bottom: 6px; }
+  .fase-reflexao p { font-size: 14px; line-height: 1.6; color: var(--text-muted); font-style: italic; }
+  
+  .fase-passos strong { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); margin-bottom: 12px; }
+  .fase-passos p { font-size: 15px; line-height: 1.6; color: var(--text-main); }
+  
+  .acao-dinamica { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--border-color); }
+  .acao-dinamica:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .acao-dinamica strong { display: inline; font-size: 15px; text-transform: none; letter-spacing: normal; color: var(--ouro-escuro); font-weight: 800; margin-right: 6px;}
+
+  /* Pitch Section Melhorada */
+  .pitch-section {
+    background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-main);
+    padding: 60px 40px; margin: 60px 0 40px 0; border-radius: 4px;
+    position: relative; overflow: hidden;
+  }
+  .pitch-section::after {
+    content: ''; position: absolute; right: 0; top: 0; width: 40%; height: 100%;
+    background: radial-gradient(circle at right, rgba(148, 118, 83, 0.05), transparent); pointer-events: none;
+  }
+  .pitch-section h2 { font-size: 36px; margin-bottom: 32px; max-width: 650px; color: var(--text-main); line-height: 1.2; }
+  .pitch-section p { font-size: 17px; line-height: 1.7; color: var(--text-main); margin-bottom: 20px; max-width: 700px; }
+  
+  .pitch-section .highlight-text { color: var(--ouro-escuro); font-weight: 700; }
+  
+  .pitch-quote {
+    background: var(--bg-light);
+    border-left: 3px solid var(--ouro-escuro); padding: 24px 32px; margin: 40px 0;
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 22px; color: var(--ouro-escuro);
+    border-radius: 0 4px 4px 0; line-height: 1.5; max-width: 700px;
+  }
+
+  .conclusion-text {
+    background: var(--bg-badge); border: 1px solid var(--border-color);
+    padding: 32px; border-radius: 4px; margin-top: 40px;
+    font-size: 17px; line-height: 1.6; color: var(--text-main); font-weight: 600;
+  }
+  .conclusion-text strong { color: var(--ouro-escuro); font-size: 18px; display: block; margin-bottom: 8px;}
+
+  /* Grid de Imagens do S.O.L */
+  .sol-images-wrapper { margin-bottom: 60px; }
+  .sol-images-title { text-align: center; font-size: 24px; margin-bottom: 32px; color: var(--ouro-escuro); }
+  .sol-images-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  .sol-image-placeholder {
+    aspect-ratio: 1 / 1;
+    background: var(--bg-light);
+    border: 1px dashed var(--ouro);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 20px; color: var(--text-muted); font-size: 13px; font-weight: 700;
+  }
+
+  .cta-box { background: var(--bg-white); padding: 40px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 40px; }
+  .cta-box h3 { font-size: 28px; color: var(--ouro-escuro); margin-bottom: 16px; line-height: 1.2; }
+  .cta-box p { color: var(--text-muted); margin-bottom: 32px; font-size: 16px; max-width: 600px; margin-inline: auto; line-height: 1.6; }
+
+  /* PDF Box */
+  .pdf-box {
+    background: var(--bg-badge); border: 1px solid var(--ouro-claro);
+    padding: 32px 40px; border-radius: 2px;
+    display: flex; align-items: center; justify-content: space-between; gap: 32px;
+  }
+  .pdf-text { flex: 1; }
+  .pdf-text h3 { font-size: 22px; color: var(--ouro-escuro); margin-bottom: 10px; }
+  .pdf-text p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+  .pdf-action { display: flex; flex-direction: column; gap: 12px; align-items: center; width: 300px; flex-shrink: 0; }
+  .pdf-action .btn { width: 100%; padding: 16px 20px; font-size: 13px; }
+  .pdf-action .micro-copy { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.4; }
+
+  /* REGRAS DE IMPRESSÃO (PDF NATIVO) */
+  @media print {
+    body { background: white; color: black; }
+    .header-bar, .cta-box, .pdf-box, .btn, .quiz-footer, .pitch-section, .sol-images-wrapper { display: none !important; }
+    .fase-accordion .acc-body { display: block !important; }
+    .fase-accordion { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ddd; margin-bottom: 20px; }
+    .report-container { max-width: 100%; padding: 0; margin: 0; }
+    .dashboard-grid { break-inside: avoid; }
+  }
+
+  @media (max-width: 900px) {
+    .captura-container { padding: 40px 20px; }
+    .benefits-row { flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 10px; }
+    .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+    .pitch-section { padding: 40px 20px; }
+    .sol-images-grid { grid-template-columns: repeat(2, 1fr); }
+    .pdf-box { flex-direction: column; text-align: center; }
+    .pdf-action { width: 100%; }
+    .benefit-pill { font-size: 12px; padding: 8px 12px; gap: 6px; white-space: nowrap; }
+  }
+  @media (max-width: 500px) {
+    .sol-images-grid { grid-template-columns: 1fr; }
+    .sol-image-placeholder { aspect-ratio: 16 / 9; }
+    .benefits-row { gap: 8px; }
+    .benefit-pill { font-size: 11px; padding: 6px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TELA 1: CAPTURA                           -->
+<!-- ══════════════════════════════════════════ -->
+<section id="tela-captura" class="tela ativa">
+  <div class="grid-bg"></div>
+  <div class="glow-bg"></div>
+  <div class="captura-container">
+    
+    <div class="badge-gratuito">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+      </svg>
+      Diagnóstico Gratuito
+    </div>
+    
+    <h1 class="captura-titulo title-font">Descubra o que está <em>travando os resultados</em> dos seus infoprodutos.</h1>
+    
+    <p class="captura-sub">O D.O.L. revela os gargalos invisíveis do seu negócio. Faça o diagnóstico agora e descubra o caminho exato para aumentar a sua probabilidade de <strong>bater as metas, gastando menos tempo e reduzindo o desgaste da sua equipe.</strong></p>
+    
+    <div class="benefits-row">
+      <div class="benefit-pill">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+        Mais Resultado
+      </div>
+      <div class="benefit-pill">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#947653" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Menos Tempo Perdido
+      </div>
+      <div class="benefit-pill">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d35400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        Menos Desgaste
+      </div>
+    </div>
+
+    <div class="form-box">
+      <h3 class="title-font">Inicie seu Diagnóstico</h3>
+      <p>Dados protegidos. Preencha para iniciar.</p>
+      
+      <div class="input-group">
+        <label>Nome</label>
+        <input type="text" id="campo-nome" placeholder="Seu Nome (ex: João Silva)">
+      </div>
+      <div class="input-group">
+        <label>E-mail</label>
+        <input type="email" id="campo-email" placeholder="Seu melhor e-mail (joao@suaempresa.com)">
+      </div>
+      <div class="input-group">
+        <label>WhatsApp</label>
+        <input type="tel" id="campo-whats" placeholder="WhatsApp com código de área ((11) 91234-5678)">
+      </div>
+      
+      <button class="btn btn-primary" onclick="iniciarQuiz()">INICIAR DIAGNÓSTICO</button>
+      <div class="form-security">🔒 Seus dados estão seguros. O diagnóstico leva menos de 3 minutos e você já sai com clareza.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TELA 2: QUESTIONÁRIO                      -->
+<!-- ══════════════════════════════════════════ -->
+<section id="tela-quiz" class="tela">
+  <div class="header-bar">
+    <div class="logo">D<span>.</span>O<span>.</span>L<span>.</span></div>
+    <div class="progress-container">
+      <span class="progress-text" id="progresso-texto">FASE 1/5</span>
+      <div class="progress-track"><div class="progress-bar" id="progresso-fill" style="width: 20%"></div></div>
+    </div>
+  </div>
+  
+  <div class="quiz-container" id="quiz-inner">
+    <!-- Renderizado via JS -->
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TELA 3: LOADING                           -->
+<!-- ══════════════════════════════════════════ -->
+<section id="tela-loading" class="tela">
+  <div class="spinner"></div>
+  <h2 class="title-font">Analisando sua operação...</h2>
+  <p>Identificando os pontos exatos onde sua operação pode ganhar mais resultado, e onde está perdendo energia desnecessariamente.</p>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TELA 4: RESULTADO                         -->
+<!-- ══════════════════════════════════════════ -->
+<section id="tela-resultado" class="tela">
+  <div class="header-bar">
+    <div class="logo">D<span>.</span>O<span>.</span>L<span>.</span></div>
+    <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.1em;">RELATÓRIO D.O.L. GERADO</div>
+  </div>
+  
+  <div class="report-container" id="resultado-inner">
+    <!-- Renderizado via JS -->
+  </div>
+</section>
+
+<script>
+// ══════════════════════════════════════════════
+// DADOS DO QUESTIONÁRIO
+// ══════════════════════════════════════════════
+const fases = [
+  {
+    nome: "Estratégia e Planejamento",
+    problemas: [
+      { id: "f1p1", texto: "Prazos são definidos de 'boca' ou perdidos no WhatsApp.", acao: "Crie um cronograma master compartilhado agora com datas de início e fim." },
+      { id: "f1p2", texto: "Não há um cronograma centralizado e visual da campanha.", acao: "Monte uma linha do tempo única com todas as fases: captação, aquecimento e carrinho." },
+      { id: "f1p3", texto: "As metas não ficam claras para toda a equipe.", acao: "Coloque os KPIs principais num painel visível a todos." },
+      { id: "f1p4", texto: "A precificação e ofertas são decididas de última hora.", acao: "Defina preço, bônus, garantia e condições antes da produção começar." },
+      { id: "f1p5", texto: "O briefing é entregue em cima da hora.", acao: "Implemente a regra: nenhuma produção começa sem o briefing assinado." },
+      { id: "f1p6", texto: "O funil não está claro nem acessível a todos.", acao: "Documente o funil em uma página: onde o lead entra e onde compra." },
+      { id: "f1p7", texto: "As demandas ficam soltas, a equipe fica sabendo tudo de última hora.", acao: "Use uma ferramenta de gestão de tarefas com responsável, prazo e status." },
+      { id: "f1p8", texto: "Não há definição clara de papéis: quem decide o quê e até quando.", acao: "Crie uma tabela de papéis clara para execução, revisão e aprovação." },
+      { id: "f1p9", texto: "O orçamento do lançamento não está documentado nem distribuído por fase.", acao: "Distribua o orçamento antes de investir: tráfego, produção e contingência." },
+    ],
+    processos: [
+      { id: "f1o1", texto: "Temos um briefing completo e documentado.", passo: "Documente o briefing completo antes de qualquer entrega. O briefing deve ter produto, oferta, público, funil, metas e prazo." },
+      { id: "f1o2", texto: "Todos sabem exatamente quando começa e termina cada fase.", passo: "Crie um cronograma master do lançamento com datas de início e fim." },
+      { id: "f1o3", texto: "Os KPIs (metas) estão visíveis para acompanhamento.", passo: "Torne as metas visíveis para todos num painel que a equipe possa acessar." },
+      { id: "f1o4", texto: "Todos entendem o funil.", passo: "Documente o funil em uma página única, mostrando onde o lead entra e avança." },
+      { id: "f1o5", texto: "Usamos ferramentas para colocar e seguir todas as demandas.", passo: "Centralize demandas em um software de gestão de tarefas. Tarefa sem responsável e data não existe." },
+      { id: "f1o6", texto: "Existe um documento de papéis e responsabilidades acessível a todos.", passo: "Defina papéis e responsabilidades por escrito. Para cada entrega, defina quem executa, aprova e o prazo." },
+      { id: "f1o7", texto: "O orçamento está planejado e distribuído por fase do lançamento.", passo: "Distribua o orçamento por fase antes de começar. Defina verba para captação, produção e contingência." },
+    ]
+  },
+  {
+    nome: "Produção de Conteúdo e Copy",
+    problemas: [
+      { id: "f2p1", texto: "Copys são aprovadas no susto e geram retrabalho.", acao: "Defina uma data de congelamento de copy, sem alterações de última hora." },
+      { id: "f2p2", texto: "Designers e editores ficam parados esperando a copy chegar.", acao: "Implemente fluxo fixo: copy entrega, design executa, especialista aprova." },
+      { id: "f2p3", texto: "Perdemos muito tempo procurando os arquivos finais.", acao: "Crie uma pasta 'FINAL' e estabeleça a regra: só entra arquivo aprovado." },
+      { id: "f2p4", texto: "Falta de padronização nas pastas do Drive.", acao: "Monte uma estrutura de pastas padrão por lançamento e replique." },
+      { id: "f2p5", texto: "O copywriter não tem clareza do que priorizar nas suas tarefas.", acao: "O gestor deve definir com o copywriter as 3 entregas mais críticas semanalmente." },
+      { id: "f2p6", texto: "Não temos calendário de conteúdo com datas de entrega e aprovação por peça.", acao: "Crie um calendário com datas de entrega para copy, design e aprovação." },
+      { id: "f2p7", texto: "O especialista não tem visibilidade do que precisa aprovar nem até quando.", acao: "Crie uma fila de aprovação centralizada para o especialista." },
+    ],
+    processos: [
+      { id: "f2o1", texto: "Temos um fluxo claro de aprovação: Copy para Design.", passo: "Implemente um fluxo de aprovação em etapas: Copy finaliza, Designer executa, Especialista aprova." },
+      { id: "f2o2", texto: "Usamos templates e padrões de nomenclatura.", passo: "Padronize a nomenclatura de arquivos e a estrutura de pastas no Drive." },
+      { id: "f2o3", texto: "O especialista aprova tudo em um único lugar.", passo: "Dê ao especialista uma fila de aprovação centralizada com prazos claros." },
+      { id: "f2o4", texto: "O copy está alinhado com as entregas e com a equipe.", passo: "Dê ao copywriter uma lista de prioridades semanal com as entregas críticas." },
+      { id: "f2o5", texto: "Temos um calendário de conteúdo com prazos de entrega e aprovação definidos.", passo: "Monte um calendário de conteúdo com datas exatas de entrega e aprovação." },
+      { id: "f2o6", texto: "O especialista tem visibilidade clara do que precisa revisar e quando.", passo: "Estabeleça datas limite de aprovação e crie lembretes automáticos." },
+    ]
+  },
+  {
+    nome: "Captação e Pré-lançamento",
+    problemas: [
+      { id: "f3p1", texto: "Não sabemos se todas as páginas estão tagueadas corretamente.", acao: "Confirme se os eventos estão disparando antes de qualquer tráfego." },
+      { id: "f3p2", texto: "Os criativos sobem na correria para o tráfego.", acao: "Defina prazo de entrega de criativos com pelo menos 48h de antecedência." },
+      { id: "f3p3", texto: "Esquecemos de testar a automação de e-mail e WhatsApp.", acao: "Dispare lead de teste e percorra a automação completa antes da captação." },
+      { id: "f3p4", texto: "A rotina de avisos nos grupos vira bagunça.", acao: "Monte calendário de comunicação nos grupos com mensagem, hora e responsável." },
+      { id: "f3p5", texto: "Não temos um processo de teste da jornada completa do lead antes de ir ao ar.", acao: "Simule a experiência do zero: anúncio, formulário, grupo e e-mail." },
+      { id: "f3p6", texto: "Não acompanhamos o custo por lead em tempo real durante a captação.", acao: "Defina um CPL-alvo e regras de pausa sem precisar de reunião." },
+    ],
+    processos: [
+      { id: "f3o1", texto: "Temos checklist de revisão de páginas (QA).", passo: "Crie e execute um checklist de QA rigoroso antes de qualquer tráfego ir ao ar." },
+      { id: "f3o2", texto: "As automações são testadas com antecedência.", passo: "Valide todas as automações com pelo menos 48h de antecedência." },
+      { id: "f3o3", texto: "Existe um calendário definido de disparos nos grupos.", passo: "Organize a rotina de comunicação nos grupos com antecedência, horários e responsáveis." },
+      { id: "f3o4", texto: "Realizamos um teste completo da jornada do lead antes de ir ao ar.", passo: "Teste a jornada completa do lead antes de ir ao ar, do anúncio ao e-mail de confirmação." },
+      { id: "f3o5", texto: "Acompanhamos CPL e performance dos criativos em tempo real durante a captação.", passo: "Acompanhe CPL diariamente e defina um gatilho para trocar criativos." },
+    ]
+  },
+  {
+    nome: "Abertura e Carrinho",
+    problemas: [
+      { id: "f4p1", texto: "A equipe de suporte fica sobrecarregada e sem direcionamento.", acao: "Faça um briefing de suporte com respostas para objeções antes da abertura." },
+      { id: "f4p2", texto: "Links de checkout quebram ou saem com preço errado.", acao: "Adicione ao checklist da Hora H testar link e preço antes de disparar." },
+      { id: "f4p3", texto: "O acompanhamento de vendas é feito de forma manual e lenta.", acao: "Monte um painel de vendas atualizado de hora em hora." },
+      { id: "f4p4", texto: "Falta um plano de contingência se a plataforma cair.", acao: "Defina link alternativo de checkout e responsável por acionar suporte." },
+      { id: "f4p5", texto: "Não temos script de recuperação de carrinho abandonado ativo durante o período de vendas.", acao: "Ative sequência mínima de recuperação: e-mail em 1h, WhatsApp em 48h." },
+      { id: "f4p6", texto: "A divisão financeira entre especialista, coprodutor e agência não está definida antes da abertura.", acao: "Documente e assine a divisão financeira antes de qualquer venda." },
+    ],
+    processos: [
+      { id: "f4o1", texto: "A equipe de recuperação de vendas tem roteiros prontos.", passo: "Prepare roteiros de suporte e recuperação antes da abertura para lidar com objeções." },
+      { id: "f4o2", texto: "Temos um checklist de 'Hora H' para abertura do carrinho.", passo: "Execute o checklist da 'Hora H' antes de abrir o carrinho, validando links e preços." },
+      { id: "f4o3", texto: "As métricas de conversão são atualizadas em tempo real.", passo: "Monitore as métricas de conversão em tempo real num dashboard visual." },
+      { id: "f4o4", texto: "Temos fluxo ativo de recuperação de carrinho (e-mail + WhatsApp) durante o carrinho.", passo: "Ative a recuperação de carrinho abandonado desde o primeiro dia de vendas." },
+      { id: "f4o5", texto: "A divisão financeira está documentada e acordada antes da abertura do carrinho.", passo: "Documente a divisão financeira antes de qualquer venda para evitar conflitos." },
+    ]
+  },
+  {
+    nome: "Pós-lançamento e Debriefing",
+    problemas: [
+      { id: "f5p1", texto: "Acaba o carrinho e a equipe 'desaparece'.", acao: "Defina responsável pelo acesso e suporte inicial antes do carrinho fechar." },
+      { id: "f5p2", texto: "Não fazemos reunião de debriefing documentada.", acao: "Agende debriefing imediatamente com documentação de acertos e falhas." },
+      { id: "f5p3", texto: "O onboarding dos novos alunos é confuso.", acao: "Mapeie a jornada do novo aluno para recebimento de acesso e boas-vindas." },
+      { id: "f5p4", texto: "Os mesmos erros se repetem no próximo lançamento.", acao: "Crie um documento de lições aprendidas para basear o próximo briefing." },
+      { id: "f5p5", texto: "Não temos processo de coleta de depoimentos logo após o lançamento.", acao: "Envie pedido de depoimento nos primeiros 5 dias após encerramento." },
+      { id: "f5p6", texto: "Não existe um repositório onde ficam registradas as lições aprendidas de cada lançamento.", acao: "Crie uma pasta central com o histórico e decisões de cada lançamento." },
+      { id: "f5p7", texto: "Não sabemos ao certo quanto o lançamento lucrou de verdade, receita bruta, reembolsos e custos de tráfego nunca ficam num lugar só.", acao: "Preencha o resultado financeiro consolidado em até 3 dias após encerramento." },
+    ],
+    processos: [
+      { id: "f5o1", texto: "Garantimos a entrega e o suporte inicial aos alunos.", passo: "Garanta o onboarding organizado dos novos alunos nos primeiros 3 dias." },
+      { id: "f5o2", texto: "Preenchemos um documento com 'o que deu bom e o que deu ruim'.", passo: "Registre as lições aprendidas de forma clara em um documento acessível." },
+      { id: "f5o3", texto: "Criamos planos de ação baseados no lançamento anterior.", passo: "Transforme as falhas do último lançamento em tarefas acionáveis para o próximo." },
+      { id: "f5o4", texto: "Temos um processo definido para coleta de depoimentos nos primeiros dias após o lançamento.", passo: "Automatize a coleta de depoimentos nos primeiros 7 dias após o fechamento." },
+      { id: "f5o5", texto: "Mantemos um repositório centralizado de lições aprendidas acessível a toda a equipe.", passo: "Mantenha um repositório centralizado de histórico de lançamentos acessível a toda a equipe." },
+      { id: "f5o6", texto: "Temos um relatório financeiro consolidado do lançamento: receita bruta, reembolsos, custo de tráfego e lucro líquido documentados.", passo: "Consolide o resultado financeiro e margem líquida do lançamento em até 3 dias." },
+    ]
+  }
+];
+
+// ══════════════════════════════════════════════
+// ESTADO E CONTROLE
+// ══════════════════════════════════════════════
+let estado = { nome: '', faseAtual: 0, respostas: {} };
+
+function mostrarTela(id) {
+  document.querySelectorAll('.tela').forEach(t => { t.classList.remove('ativa'); t.style.display = 'none'; });
+  const t = document.getElementById(id);
+  t.style.display = 'flex';
+  setTimeout(() => t.classList.add('ativa'), 10);
+  window.scrollTo(0, 0);
+}
+
+function iniciarQuiz() {
+  const nome = document.getElementById('campo-nome').value.trim();
+  const email = document.getElementById('campo-email').value.trim();
+  const whats = document.getElementById('campo-whats').value.trim();
+
+  // Validação simples
+  if (!nome || !email || !whats) { 
+    alert('Por favor, preencha todos os campos para prosseguir (Nome, E-mail e WhatsApp).'); 
+    return; 
+  }
+
+  // --- GOOGLE SHEETS INTEGRATION ---
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyphfhWf5YrWbk420O8VnHiiF5w1DrFyhfl0fKS4sfkacxChmAnROuCeTrx4BFKGho/exec';
+  
+  if (scriptURL !== '') {
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('email', email);
+    formData.append('whatsapp', whats);
+    formData.append('data', new Date().toLocaleString('pt-BR'));
+    
+    // Envia silenciosamente para a planilha
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .catch(error => console.error('Erro ao salvar lead:', error));
+  }
+
+  estado.nome = nome.split(' ');
+  estado.faseAtual = 0;
+  renderizarFase(0);
+  mostrarTela('tela-quiz');
+}
+
+function renderizarFase(idx) {
+  const fase = fases[idx];
+  document.getElementById('progresso-texto').textContent = `FASE ${idx + 1}/${fases.length}`;
+  document.getElementById('progresso-fill').style.width = `${((idx + 1) / fases.length) * 100}%`;
+
+  let html = `
+    <p class="quiz-instrucao">Seja honesto. Quanto mais preciso você for, mais útil será a sua análise.</p>
+    <div class="fase-indicator tag">✦ Avaliação: Seção ${idx + 1}</div>
+    <h2 class="quiz-title title-font">${fase.nome}</h2>
+    
+    <div class="section-label">Quais destes problemas você enfrenta?</div>
+    <div class="options-grid">
+  `;
+
+  fase.problemas.forEach(p => {
+    const isSelected = estado.respostas[p.id];
+    html += `
+      <div class="option-card ${isSelected ? 'selected' : ''}" onclick="toggleOpcao('${p.id}', this)">
+        <div class="checkbox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        <div class="option-text">${p.texto}</div>
+      </div>
+    `;
+  });
+
+  html += `</div><div class="section-label" style="margin-top:40px;">Quais destes processos você já possui?</div><div class="options-grid">`;
+
+  fase.processos.forEach(p => {
+    const isSelected = estado.respostas[p.id];
+    html += `
+      <div class="option-card ${isSelected ? 'selected' : ''}" onclick="toggleOpcao('${p.id}', this)">
+        <div class="checkbox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        <div class="option-text">${p.texto}</div>
+      </div>
+    `;
+  });
+
+  html += `
+    </div>
+    <div class="quiz-footer">
+      <button class="btn btn-outline" onclick="voltarFase()">${idx === 0 ? '← Voltar' : '← Fase Anterior'}</button>
+      <button class="btn btn-primary" onclick="avancarFase()">${idx === fases.length - 1 ? 'Ver Meu Resultado →' : 'Próxima Fase →'}</button>
+    </div>
+  `;
+
+  document.getElementById('quiz-inner').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function toggleOpcao(id, el) {
+  if (estado.respostas[id]) {
+    delete estado.respostas[id];
+    el.classList.remove('selected');
+  } else {
+    estado.respostas[id] = true;
+    el.classList.add('selected');
+  }
+}
+
+function voltarFase() {
+  if (estado.faseAtual === 0) { mostrarTela('tela-captura'); return; }
+  estado.faseAtual--; renderizarFase(estado.faseAtual);
+}
+
+function avancarFase() {
+  if (estado.faseAtual < fases.length - 1) {
+    estado.faseAtual++; renderizarFase(estado.faseAtual);
+  } else {
+    mostrarTela('tela-loading');
+    setTimeout(() => { gerarResultado(); mostrarTela('tela-resultado'); }, 2000);
+  }
+}
+
+// ══════════════════════════════════════════════
+// CÁLCULO E RELATÓRIO DINÂMICO
+// ══════════════════════════════════════════════
+function calcularScoreFase(idx) {
+  const f = fases[idx];
+  let ptsProcessos = 0;
+  let ptsProblemas = 0;
+  
+  f.processos.forEach(p => { if (estado.respostas[p.id]) ptsProcessos++; });
+  f.problemas.forEach(p => { if (estado.respostas[p.id]) ptsProblemas++; });
+  
+  let scoreBase = f.processos.length > 0 ? (ptsProcessos / f.processos.length) * 100 : 0;
+  let penalty = f.problemas.length > 0 ? (ptsProblemas / f.problemas.length) * 30 : 0;
+  
+  let finalScore = Math.round(scoreBase - penalty);
+  finalScore = Math.max(0, Math.min(100, finalScore));
+  
+  return { pct: finalScore, nivel: finalScore >= 75 ? 'otimo' : finalScore >= 45 ? 'atencao' : 'critico' };
+}
+
+function gerarResultado() {
+  let totalScore = 0;
+  const resultadosFases = fases.map((f, i) => {
+    const s = calcularScoreFase(i); totalScore += s.pct;
+    return { ...f, idx: i, score: s };
+  });
+  
+  const scoreGeral = Math.round(totalScore / fases.length);
+  const nivelGeral = scoreGeral >= 75 ? 'otimo' : scoreGeral >= 45 ? 'atencao' : 'critico';
+
+  const textosDiag = {
+    otimo: { t: "Operação Otimizada", p: "Sua operação está sólida. Você já eliminou a maioria dos gargalos que travam outros gestores, agora o jogo é outro: escalar resultado sem multiplicar esforço. É aqui que o S.O.L. pode fazer a diferença." },
+    atencao: { t: "Requer Atenção", p: "Sua operação entrega, mas custa mais do que deveria. Você está investindo tempo e energia em pontos que, se ajustados, aumentariam diretamente sua probabilidade de bater metas. O caminho existe. Só precisa ser mapeado." },
+    critico: { t: "Operação Caótica", p: "Atenção: sua operação ainda depende de força bruta para funcionar. Isso não é um problema de esforço, é um problema de estrutura. E nesse cenário, aumentar o volume do lançamento não aumenta o resultado: só aumenta o caos. O D.O.L. mostrou onde estão as brechas. O próximo passo é fechar cada uma delas." }
+  };
+
+  const statusMap = { otimo: 'Ótimo', atencao: 'Atenção', critico: 'Crítico' };
+
+  let dashHtml = `<div class="dashboard-grid">`;
+  resultadosFases.forEach(f => {
+    dashHtml += `
+      <div class="dash-card">
+        <div class="dash-card-title">Fase ${f.idx + 1}</div>
+        <div class="status-label status-${f.score.nivel}">${statusMap[f.score.nivel]}</div>
+      </div>
+    `;
+  });
+  dashHtml += `</div>`;
+
+  resultadosFases.sort((a, b) => {
+    if (a.score.pct !== b.score.pct) {
+      return a.score.pct - b.score.pct;
+    }
+    return a.idx - b.idx;
+  });
+
+  const faseReflexoes = [
+    "Cada item não marcado nessa fase é um ponto onde sua operação começa com incerteza, e incerteza no início se multiplica em retrabalho e perda de resultado no final.",
+    "Os gargalos de produção não são problema de talento, são problema de fluxo. Quando a copy chega tarde, todo o restante da cadeia atrasa em cascata: design, aprovação, publicação.",
+    "A fase de captação é onde mais dinheiro é desperdiçado por falta de processo. Tráfego rodando sem tagueamento correto, criativos subindo sem teste, automações que nunca foram validadas, tudo isso gera custo invisível.",
+    "A abertura do carrinho é o momento de maior pressão, e onde erros custam mais caro. Um checkout quebrado, um suporte sem roteiro ou uma recuperação mal feita podem custar dezenas de milhares em vendas não realizadas.",
+    "A maioria das equipes encerra o carrinho e desaparece. Isso é um erro estratégico grave: o pós-lançamento é onde você consolida os resultados, captura a prova social no momento certo e garante que o próximo lançamento comece melhor do que esse."
+  ];
+
+  let planoHtml = '';
+  resultadosFases.forEach(f => {
+    const problemasAtivos = f.problemas.filter(p => estado.respostas[p.id]);
+    const processosFaltantes = f.processos.filter(p => !estado.respostas[p.id]);
+    
+    let acoesList = [];
+    problemasAtivos.forEach(p => acoesList.push(`<strong>Solucionar Gargalo:</strong> ${p.acao}`));
+    processosFaltantes.forEach(p => acoesList.push(`<strong>Processo Faltante:</strong> ${p.passo}`));
+
+    let faseBodyHtml = '';
+    
+    if (acoesList.length === 0) {
+      faseBodyHtml = `
+        <div class="fase-reflexao" style="border-color: #2E7D32;">
+          <strong>Nenhum atrito detectado:</strong>
+          <p>Sua operação nesta etapa está blindada e rodando com maturidade.</p>
+        </div>
+        <div class="fase-passos">
+          <strong>Diretriz de Manutenção:</strong>
+          <p>Você já dominou os processos essenciais aqui. O foco deve ser garantir que a equipe mantenha o padrão de execução e não perca os rituais à medida que o volume de lançamentos escala.</p>
+        </div>
+      `;
+    } else {
+      let topAcoes = acoesList.slice(0, 3).map(a => `<div class="acao-dinamica">${a}</div>`).join('');
+      faseBodyHtml = `
+        <div class="fase-reflexao">
+          <strong>O que os seus dados revelam:</strong>
+          <p>${faseReflexoes[f.idx]}</p>
+        </div>
+        <div class="fase-passos">
+          <strong>Seu Plano de Ação Personalizado:</strong>
+          <div style="margin-top:16px;">${topAcoes}</div>
+        </div>
+      `;
+    }
+
+    planoHtml += `
+      <div class="fase-accordion ${f.idx === resultadosFases.idx ? 'open' : ''}">
+        <div class="acc-header" onclick="this.parentElement.classList.toggle('open')">
+          <div class="acc-header-left">
+            <span class="status-label status-${f.score.nivel}">${statusMap[f.score.nivel]}</span>
+            <span class="acc-title">Fase ${f.idx + 1}: ${f.nome}</span>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="acc-body">
+          ${faseBodyHtml}
+        </div>
+      </div>
+    `;
+  });
+
+  const html = `
+    <div class="report-header">
+      <div class="tag">Análise Estratégica Concluída</div>
+      <h1 class="title-font">Aqui está o seu diagnóstico,<br><em>${estado.nome}</em></h1>
+      <p>Abaixo está o raio-x da sua operação, com a clareza sobre onde o faturamento está sendo perdido por atrito de processos.</p>
+    </div>
+
+    ${dashHtml}
+
+    <div class="veredito-box ${nivelGeral}">
+      <h2 class="title-font">Status da Operação: ${textosDiag[nivelGeral].t}</h2>
+      <p>${textosDiag[nivelGeral].p}</p>
+    </div>
+
+    <h3 class="title-font action-plan-title">Seu Plano de Ação Estratégico</h3>
+    <p class="action-plan-sub">Analisando seus dados, siga estes passos abaixo e você já irá otimizar sua operação de imediato. Priorizado por nível de criticidade.</p>
+    
+    ${planoHtml}
+
+    <div class="pitch-section">
+      <h2 class="title-font">Agora você sabe onde estão os gargalos.<br><em>A pergunta é: quanto tempo vai levar para resolver cada um deles sozinho?</em></h2>
+      
+      <p>A maioria dos gestores que fazem esse diagnóstico reconhece tudo que está aqui. <span class="highlight-text">Não é falta de conhecimento, é falta de tempo, de estrutura e de alguém que já tenha montado isso antes.</span></p>
+      
+      <p>O problema não é saber o que fazer. O problema é que, no meio de um lançamento, você não tem bandwidth para parar, estruturar e implementar. <span class="highlight-text">E o próximo lançamento começa antes que o anterior termine de ser processado.</span></p>
+      
+      <div class="pitch-quote">
+        "O S.O.L. não nasceu de uma teoria. Nasceu de lançamentos reais, de cronogramas que quebraram, de copys que atrasaram, de checkouts que quebraram na hora H. Cada item do passo a passo que você acabou de ler foi testado e refinado."
+      </div>
+      
+      <div class="conclusion-text">
+        <strong>Com o S.O.L.:</strong> Cada fase tem um fluxo documentado, o checklist existe antes do lançamento começar, você tem visibilidade em tempo real e o próximo lançamento começa mais forte porque o anterior foi registrado.
+      </div>
+    </div>
+
+    <div class="sol-images-wrapper">
+      <h3 class="title-font sol-images-title">Por dentro da engenharia do S.O.L.</h3>
+      <div class="sol-images-grid">
+        <div class="sol-image-placeholder"></div>
+        <div class="sol-image-placeholder"></div>
+        <div class="sol-image-placeholder"></div>
+        <div class="sol-image-placeholder"></div>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <h3 class="title-font">Aumente sua probabilidade de bater as metas, sem precisar trabalhar mais para isso.</h3>
+      <p>O S.O.L. não é mais uma ferramenta pra você configurar sozinho. É um processo validado, implementado lado a lado com você, pra que cada fase do seu lançamento tenha um caminho claro, sua equipe saiba exatamente o que fazer, e você pare de depender de força bruta para entregar resultado.</p>
+      
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLScFYluo4F1MhDhIXH6m3BLz_xS0Smkh_mj8Xd9aKjOrGOG6Ow/viewform" target="_blank" class="btn btn-primary" style="margin-top:10px; text-decoration: none;">QUERO ESTRUTURAR MINHA OPERAÇÃO</a>
+      
+      <div style="font-size: 13px; color: var(--text-muted); margin-top: 16px;">Implementação guiada. Você não configura sozinho.</div>
+    </div>
+
+    <div class="pdf-box">
+      <div class="pdf-text">
+        <h3 class="title-font">Quer guardar esse diagnóstico para compartilhar com sua equipe?</h3>
+        <p>Baixe o relatório completo em PDF, com os gargalos identificados, o plano de ação e as ações prioritárias para o próximo lançamento.</p>
+      </div>
+      <div class="pdf-action">
+        <button class="btn btn-primary" onclick="baixarPDF()">BAIXAR MEU RELATÓRIO EM PDF</button>
+        <span class="micro-copy">Clique acima para salvar ou imprimir o seu relatório na hora.</span>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('resultado-inner').innerHTML = html;
+}
+
+function baixarPDF() {
+  window.print();
+}
+</script>
+</body>
+</html>
