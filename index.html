@@ -85,7 +85,7 @@
   }
   .btn-outline:hover { border-color: var(--ouro-escuro); color: var(--ouro-escuro); }
 
-  /* ── TELA 1: CAPTURA ── */
+  /* ── TELA 1: CAPTURA (ESTILO SCREENSHOT) ── */
   #tela-captura {
     background: var(--bg-light);
     position: relative;
@@ -274,7 +274,6 @@
   .acc-body { display: none; padding: 0 24px 24px; border-top: 1px solid var(--border-color); }
   .fase-accordion.open .acc-body { display: block; }
   
-  /* Estrutura de Reflexão e Passos */
   .fase-reflexao {
     background: var(--bg-light);
     border-left: 3px solid var(--ouro-claro);
@@ -293,7 +292,7 @@
   .acao-dinamica:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
   .acao-dinamica strong { display: inline; font-size: 15px; text-transform: none; letter-spacing: normal; color: var(--ouro-escuro); font-weight: 800; margin-right: 6px;}
 
-  /* Pitch Section Melhorada */
+  /* Pitch Section */
   .pitch-section {
     background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-main);
     padding: 60px 40px; margin: 60px 0 40px 0; border-radius: 4px;
@@ -305,7 +304,6 @@
   }
   .pitch-section h2 { font-size: 36px; margin-bottom: 32px; max-width: 650px; color: var(--text-main); line-height: 1.2; }
   .pitch-section p { font-size: 17px; line-height: 1.7; color: var(--text-main); margin-bottom: 20px; max-width: 700px; }
-  
   .pitch-section .highlight-text { color: var(--ouro-escuro); font-weight: 700; }
   
   .pitch-quote {
@@ -322,24 +320,108 @@
   }
   .conclusion-text strong { color: var(--ouro-escuro); font-size: 18px; display: block; margin-bottom: 8px;}
 
-  /* Grid S.O.L */
+  /* ── SLIDER S.O.L (Esquerda Imagem, Direita Texto) ── */
   .sol-images-wrapper { margin-bottom: 60px; }
-  .sol-images-title { text-align: center; font-size: 24px; margin-bottom: 32px; color: var(--ouro-escuro); }
-  .sol-images-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .sol-image-placeholder {
-    aspect-ratio: 1 / 1;
-    background: var(--bg-light);
-    border: 1px dashed var(--ouro);
+  .sol-images-title { text-align: center; font-size: 32px; margin-bottom: 40px; color: var(--ouro-escuro); }
+  
+  .sol-showcase-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    overflow: hidden;
-  }
-  .sol-image-placeholder img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(91, 59, 3, 0.03);
   }
 
+  .sol-slider-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: var(--bg-light);
+  }
+
+  .sol-slides-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .sol-slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+  .sol-slide.active { opacity: 1; }
+
+  .sol-dots {
+    position: absolute;
+    bottom: 16px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 10;
+  }
+
+  .sol-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px solid var(--ouro-escuro);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .sol-dot.active { background: var(--ouro-escuro); }
+
+  .sol-showcase-text h4 {
+    font-size: 26px;
+    color: var(--ouro-escuro);
+    margin-bottom: 16px;
+    line-height: 1.2;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .sol-showcase-text p {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .sol-features {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sol-features li {
+    font-size: 15px;
+    color: var(--text-main);
+    line-height: 1.5;
+    padding-left: 24px;
+    position: relative;
+  }
+
+  .sol-features li::before {
+    content: '✦';
+    position: absolute;
+    left: 0; top: 1px;
+    color: var(--ouro);
+    font-size: 14px;
+  }
+
+  /* CTA Box */
   .cta-box { background: var(--bg-white); padding: 40px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 40px; }
   .cta-box h3 { font-size: 28px; color: var(--ouro-escuro); margin-bottom: 16px; line-height: 1.2; }
   .cta-box p { color: var(--text-muted); margin-bottom: 32px; font-size: 16px; max-width: 600px; margin-inline: auto; line-height: 1.6; }
@@ -367,21 +449,30 @@
     .dashboard-grid { break-inside: avoid; }
   }
 
+  /* RESPONSIVIDADE */
   @media (max-width: 900px) {
     .captura-container { padding: 40px 20px; }
     .benefits-row { flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 10px; }
     .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
     .pitch-section { padding: 40px 20px; }
-    .sol-images-grid { grid-template-columns: repeat(2, 1fr); }
+    
+    .sol-showcase-inner { grid-template-columns: 1fr; padding: 24px; }
+    
     .pdf-box { flex-direction: column; text-align: center; }
     .pdf-action { width: 100%; }
     .benefit-pill { font-size: 12px; padding: 8px 12px; gap: 6px; white-space: nowrap; }
   }
   @media (max-width: 500px) {
-    .sol-images-grid { grid-template-columns: 1fr; }
-    .sol-image-placeholder { aspect-ratio: 16 / 9; }
+    .sol-slider-wrapper { aspect-ratio: 4 / 3; }
     .benefits-row { gap: 8px; }
     .benefit-pill { font-size: 11px; padding: 6px 10px; }
+    
+    .form-box { padding: 32px 20px; }
+    .captura-titulo { font-size: 32px; }
+    .dash-card { padding: 20px 10px; }
+    .acc-header { padding: 16px; }
+    .acc-title { font-size: 14px; }
+    .pitch-section { padding: 40px 20px; }
   }
 </style>
 </head>
@@ -580,8 +671,12 @@ const fases = [
   }
 ];
 
-// ESTADO E CONTROLE (Modificado para guardar dados globais para envio no fim)
+// ESTADO E CONTROLE (Guarda dados globais para envio no fim)
 let estado = { nome: '', nomeOriginal: '', email: '', whats: '', profissao: '', faseAtual: 0, respostas: {} };
+
+// Controle do Slider de Imagens
+let slideIndex = 0;
+let slideTimer;
 
 function mostrarTela(id) {
   document.querySelectorAll('.tela').forEach(t => { t.classList.remove('ativa'); t.style.display = 'none'; });
@@ -717,6 +812,47 @@ function calcularScoreFase(idx) {
   finalScore = Math.max(0, Math.min(100, finalScore));
   
   return { pct: finalScore, nivel: finalScore >= 75 ? 'otimo' : finalScore >= 45 ? 'atencao' : 'critico' };
+}
+
+// FUNÇÕES DO SLIDER (Carrossel)
+function iniciarSlider() {
+  slideIndex = 0;
+  mostrarSlide(slideIndex);
+  if (slideTimer) clearInterval(slideTimer);
+  slideTimer = setInterval(() => mudarSlideManual(1), 3500); // Troca a cada 3.5s
+}
+
+function mudarSlideManual(n) {
+  slideIndex += n;
+  mostrarSlide(slideIndex);
+  clearInterval(slideTimer);
+  slideTimer = setInterval(() => mudarSlideManual(1), 3500);
+}
+
+function irParaSlide(n) {
+  slideIndex = n;
+  mostrarSlide(slideIndex);
+  clearInterval(slideTimer);
+  slideTimer = setInterval(() => mudarSlideManual(1), 3500);
+}
+
+function mostrarSlide(n) {
+  let slides = document.getElementsByClassName("sol-slide");
+  let dots = document.getElementsByClassName("sol-dot");
+  if (!slides.length) return;
+  
+  if (n >= slides.length) { slideIndex = 0; }    
+  if (n < 0) { slideIndex = slides.length - 1; }
+  
+  for (let i = 0; i < slides.length; i++) {
+      slides[i].classList.remove("active");
+  }
+  for (let i = 0; i < dots.length; i++) {
+      dots[i].classList.remove("active");
+  }
+  
+  slides[slideIndex].classList.add("active");
+  if (dots.length > 0) dots[slideIndex].classList.add("active");
 }
 
 function gerarResultado() {
@@ -880,18 +1016,33 @@ function gerarResultado() {
 
     <div class="sol-images-wrapper">
       <h3 class="title-font sol-images-title">Por dentro da engenharia do S.O.L.</h3>
-      <div class="sol-images-grid">
-        <div class="sol-image-placeholder">
-          <img src="dashboard.png" alt="Dashboard S.O.L">
+      
+      <div class="sol-showcase-inner">
+        <!-- Esquerda: Slider -->
+        <div class="sol-slider-wrapper">
+          <div class="sol-slides-container">
+            <img src="dashboard.png" class="sol-slide active" alt="Dashboard S.O.L">
+            <img src="cronograma.png" class="sol-slide" alt="Cronograma S.O.L">
+            <img src="processos.png" class="sol-slide" alt="Processos S.O.L">
+            <img src="indicadores.png" class="sol-slide" alt="Indicadores S.O.L">
+          </div>
+          <div class="sol-dots">
+            <span class="sol-dot active" onclick="irParaSlide(0)"></span> 
+            <span class="sol-dot" onclick="irParaSlide(1)"></span> 
+            <span class="sol-dot" onclick="irParaSlide(2)"></span> 
+            <span class="sol-dot" onclick="irParaSlide(3)"></span> 
+          </div>
         </div>
-        <div class="sol-image-placeholder">
-          <img src="cronograma.png" alt="Cronograma S.O.L">
-        </div>
-        <div class="sol-image-placeholder">
-          <img src="processos.png" alt="Processos S.O.L">
-        </div>
-        <div class="sol-image-placeholder">
-          <img src="indicadores.png" alt="Indicadores S.O.L">
+        
+        <!-- Direita: Texto -->
+        <div class="sol-showcase-text">
+          <h4 class="title-font">A estrutura que substitui o caos por previsibilidade</h4>
+          <p>O S.O.L. entrega um ecossistema completo onde cada etapa do seu lançamento está mapeada e pronta para execução pela sua equipe.</p>
+          <ul class="sol-features">
+            <li><strong>Visibilidade Total:</strong> Dashboards e cronogramas que mostram o status real de cada peça em tempo real.</li>
+            <li><strong>Fim do Microgerenciamento:</strong> Processos validados e checklists que garantem o padrão de qualidade sem depender da sua revisão.</li>
+            <li><strong>Histórico Inteligente:</strong> Indicadores e debriefings documentados para que o próximo ciclo já comece na frente.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -918,6 +1069,9 @@ function gerarResultado() {
   `;
 
   document.getElementById('resultado-inner').innerHTML = html;
+  
+  // Inicia o carrossel assim que o resultado carregar
+  iniciarSlider();
 }
 
 function baixarPDF() {
