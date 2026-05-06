@@ -85,7 +85,7 @@
   }
   .btn-outline:hover { border-color: var(--ouro-escuro); color: var(--ouro-escuro); }
 
-  /* ── TELA 1: CAPTURA (ESTILO SCREENSHOT) ── */
+  /* ── TELA 1: CAPTURA ── */
   #tela-captura {
     background: var(--bg-light);
     position: relative;
@@ -226,7 +226,7 @@
   #tela-loading h2 { font-size: 28px; margin-bottom: 16px; color: var(--ouro-escuro); }
   #tela-loading p { color: var(--text-muted); font-size: 16px; max-width: 500px; line-height: 1.6; margin: 0 auto; }
 
-  /* ── TELA 4: RESULTADO (RELATÓRIO EXECUTIVO) ── */
+  /* ── TELA 4: RESULTADO ── */
   #tela-resultado { background: var(--bg-light); }
   
   .report-container { max-width: 900px; margin: 40px auto 80px; padding: 0 20px; width: 100%; }
@@ -274,7 +274,6 @@
   .acc-body { display: none; padding: 0 24px 24px; border-top: 1px solid var(--border-color); }
   .fase-accordion.open .acc-body { display: block; }
   
-  /* Estrutura de Reflexão e Passos */
   .fase-reflexao {
     background: var(--bg-light);
     border-left: 3px solid var(--ouro-claro);
@@ -293,7 +292,7 @@
   .acao-dinamica:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
   .acao-dinamica strong { display: inline; font-size: 15px; text-transform: none; letter-spacing: normal; color: var(--ouro-escuro); font-weight: 800; margin-right: 6px;}
 
-  /* Pitch Section Melhorada */
+  /* Pitch Section */
   .pitch-section {
     background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-main);
     padding: 60px 40px; margin: 60px 0 40px 0; border-radius: 4px;
@@ -322,12 +321,10 @@
   }
   .conclusion-text strong { color: var(--ouro-escuro); font-size: 18px; display: block; margin-bottom: 8px;}
 
-  /* Grid de Imagens do S.O.L */
+  /* Grid S.O.L */
   .sol-images-wrapper { margin-bottom: 60px; }
   .sol-images-title { text-align: center; font-size: 24px; margin-bottom: 32px; color: var(--ouro-escuro); }
-  .sol-images-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
-  }
+  .sol-images-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
   .sol-image-placeholder {
     aspect-ratio: 1 / 1;
     background: var(--bg-light);
@@ -384,9 +381,7 @@
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════ -->
-<!-- TELA 1: CAPTURA                           -->
-<!-- ══════════════════════════════════════════ -->
+<!-- TELA 1: CAPTURA -->
 <section id="tela-captura" class="tela ativa">
   <div class="grid-bg"></div>
   <div class="glow-bg"></div>
@@ -441,9 +436,7 @@
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════ -->
-<!-- TELA 2: QUESTIONÁRIO                      -->
-<!-- ══════════════════════════════════════════ -->
+<!-- TELA 2: QUESTIONÁRIO -->
 <section id="tela-quiz" class="tela">
   <div class="header-bar">
     <div class="logo">D<span>.</span>O<span>.</span>L<span>.</span></div>
@@ -453,38 +446,28 @@
     </div>
   </div>
   
-  <div class="quiz-container" id="quiz-inner">
-    <!-- Renderizado via JS -->
-  </div>
+  <div class="quiz-container" id="quiz-inner"></div>
 </section>
 
-<!-- ══════════════════════════════════════════ -->
-<!-- TELA 3: LOADING                           -->
-<!-- ══════════════════════════════════════════ -->
+<!-- TELA 3: LOADING -->
 <section id="tela-loading" class="tela">
   <div class="spinner"></div>
   <h2 class="title-font">Analisando sua operação...</h2>
   <p>Identificando os pontos exatos onde sua operação pode ganhar mais resultado, e onde está perdendo energia desnecessariamente.</p>
 </section>
 
-<!-- ══════════════════════════════════════════ -->
-<!-- TELA 4: RESULTADO                         -->
-<!-- ══════════════════════════════════════════ -->
+<!-- TELA 4: RESULTADO -->
 <section id="tela-resultado" class="tela">
   <div class="header-bar">
     <div class="logo">D<span>.</span>O<span>.</span>L<span>.</span></div>
     <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.1em;">RELATÓRIO D.O.L. GERADO</div>
   </div>
   
-  <div class="report-container" id="resultado-inner">
-    <!-- Renderizado via JS -->
-  </div>
+  <div class="report-container" id="resultado-inner"></div>
 </section>
 
 <script>
-// ══════════════════════════════════════════════
 // DADOS DO QUESTIONÁRIO
-// ══════════════════════════════════════════════
 const fases = [
   {
     nome: "Estratégia e Planejamento",
@@ -587,9 +570,7 @@ const fases = [
   }
 ];
 
-// ══════════════════════════════════════════════
 // ESTADO E CONTROLE
-// ══════════════════════════════════════════════
 let estado = { nome: '', faseAtual: 0, respostas: {} };
 
 function mostrarTela(id) {
@@ -605,7 +586,6 @@ function iniciarQuiz() {
   const email = document.getElementById('campo-email').value.trim();
   const whats = document.getElementById('campo-whats').value.trim();
 
-  // Validação simples
   if (!nome || !email || !whats) { 
     alert('Por favor, preencha todos os campos para prosseguir (Nome, E-mail e WhatsApp).'); 
     return; 
@@ -621,8 +601,8 @@ function iniciarQuiz() {
     formData.append('whatsapp', whats);
     formData.append('data', new Date().toLocaleString('pt-BR'));
     
-    // Envia silenciosamente para a planilha
-    fetch(scriptURL, { method: 'POST', body: formData })
+    // mode: 'no-cors' permite o envio sem erro do navegador
+    fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: formData })
       .catch(error => console.error('Erro ao salvar lead:', error));
   }
 
@@ -704,9 +684,7 @@ function avancarFase() {
   }
 }
 
-// ══════════════════════════════════════════════
-// CÁLCULO E RELATÓRIO DINÂMICO
-// ══════════════════════════════════════════════
+// CÁLCULO E RELATÓRIO
 function calcularScoreFase(idx) {
   const f = fases[idx];
   let ptsProcessos = 0;
