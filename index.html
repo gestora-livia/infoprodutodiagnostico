@@ -274,6 +274,7 @@
   .acc-body { display: none; padding: 0 24px 24px; border-top: 1px solid var(--border-color); }
   .fase-accordion.open .acc-body { display: block; }
   
+  /* Estrutura de Reflexão e Passos */
   .fase-reflexao {
     background: var(--bg-light);
     border-left: 3px solid var(--ouro-claro);
@@ -292,7 +293,7 @@
   .acao-dinamica:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
   .acao-dinamica strong { display: inline; font-size: 15px; text-transform: none; letter-spacing: normal; color: var(--ouro-escuro); font-weight: 800; margin-right: 6px;}
 
-  /* Pitch Section */
+  /* Pitch Section Melhorada */
   .pitch-section {
     background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-main);
     padding: 60px 40px; margin: 60px 0 40px 0; border-radius: 4px;
@@ -331,7 +332,12 @@
     border: 1px dashed var(--ouro);
     border-radius: 4px;
     display: flex; align-items: center; justify-content: center; text-align: center;
-    padding: 20px; color: var(--text-muted); font-size: 13px; font-weight: 700;
+    overflow: hidden;
+  }
+  .sol-image-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .cta-box { background: var(--bg-white); padding: 40px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 40px; }
@@ -428,6 +434,10 @@
       <div class="input-group">
         <label>WhatsApp</label>
         <input type="tel" id="campo-whats" placeholder="WhatsApp com código de área ((11) 91234-5678)">
+      </div>
+      <div class="input-group">
+        <label>Profissão / Função</label>
+        <input type="text" id="campo-profissao" placeholder="Ex: Gestor de tráfego, Copywriter, Especialista...">
       </div>
       
       <button class="btn btn-primary" onclick="iniciarQuiz()">INICIAR DIAGNÓSTICO</button>
@@ -570,8 +580,8 @@ const fases = [
   }
 ];
 
-// ESTADO E CONTROLE
-let estado = { nome: '', faseAtual: 0, respostas: {} };
+// ESTADO E CONTROLE (Modificado para guardar dados globais para envio no fim)
+let estado = { nome: '', nomeOriginal: '', email: '', whats: '', profissao: '', faseAtual: 0, respostas: {} };
 
 function mostrarTela(id) {
   document.querySelectorAll('.tela').forEach(t => { t.classList.remove('ativa'); t.style.display = 'none'; });
@@ -585,28 +595,35 @@ function iniciarQuiz() {
   const nome = document.getElementById('campo-nome').value.trim();
   const email = document.getElementById('campo-email').value.trim();
   const whats = document.getElementById('campo-whats').value.trim();
+  const profissao = document.getElementById('campo-profissao').value.trim();
 
-  if (!nome || !email || !whats) { 
-    alert('Por favor, preencha todos os campos para prosseguir (Nome, E-mail e WhatsApp).'); 
+  if (!nome || !email || !whats || !profissao) { 
+    alert('Por favor, preencha todos os campos para prosseguir (Nome, E-mail, WhatsApp e Profissão).'); 
     return; 
   }
 
-  // --- GOOGLE SHEETS INTEGRATION ---
+  estado.nomeOriginal = nome;
+  estado.email = email;
+  estado.whats = whats;
+  estado.profissao = profissao;
+  estado.nome = nome.split(' ');
+
+  // --- GOOGLE SHEETS INTEGRATION (ENVIO INICIAL) ---
   const scriptURL = 'https://script.google.com/macros/s/AKfycbyphfhWf5YrWbk420O8VnHiiF5w1DrFyhfl0fKS4sfkacxChmAnROuCeTrx4BFKGho/exec';
   
   if (scriptURL !== '') {
     const formData = new FormData();
-    formData.append('nome', nome);
-    formData.append('email', email);
-    formData.append('whatsapp', whats);
-    formData.append('data', new Date().toLocaleString('pt-BR'));
+    formData.append('data', new Date().toLocaleString('pt-BR') + ' (Apenas Iniciou)');
+    formData.append('nome', estado.nomeOriginal);
+    formData.append('email', estado.email);
+    formData.append('whatsapp', estado.whats);
+    formData.append('profissao', estado.profissao);
     
     // mode: 'no-cors' permite o envio sem erro do navegador
     fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: formData })
-      .catch(error => console.error('Erro ao salvar lead:', error));
+      .catch(error => console.error('Erro ao salvar lead inicial:', error));
   }
 
-  estado.nome = nome.split(' ');
   estado.faseAtual = 0;
   renderizarFase(0);
   mostrarTela('tela-quiz');
@@ -738,6 +755,34 @@ function gerarResultado() {
     return a.idx - b.idx;
   });
 
+  // --- GOOGLE SHEETS INTEGRATION (ENVIO DOS RESULTADOS FINAIS) ---
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyphfhWf5YrWbk420O8VnHiiF5w1DrFyhfl0fKS4sfkacxChmAnROuCeTrx4BFKGho/exec';
+  const formData = new FormData();
+  formData.append('data', new Date().toLocaleString('pt-BR') + ' (Finalizou)');
+  formData.append('nome', estado.nomeOriginal);
+  formData.append('email', estado.email);
+  formData.append('whatsapp', estado.whats);
+  formData.append('profissao', estado.profissao);
+  formData.append('scoreGeral', scoreGeral + '%');
+  formData.append('veredito', textosDiag[nivelGeral].t);
+  
+  const getScore = (idx) => {
+    const f = resultadosFases.find(fase => fase.idx === idx);
+    return f ? f.score.pct + '%' : '';
+  };
+  
+  formData.append('fase1', getScore(0));
+  formData.append('fase2', getScore(1));
+  formData.append('fase3', getScore(2));
+  formData.append('fase4', getScore(3));
+  formData.append('fase5', getScore(4));
+
+  if (scriptURL !== '') {
+    fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: formData })
+      .catch(error => console.error('Erro ao salvar resultados finais:', error));
+  }
+  // ---------------------------------------------------------------
+
   const faseReflexoes = [
     "Cada item não marcado nessa fase é um ponto onde sua operação começa com incerteza, e incerteza no início se multiplica em retrabalho e perda de resultado no final.",
     "Os gargalos de produção não são problema de talento, são problema de fluxo. Quando a copy chega tarde, todo o restante da cadeia atrasa em cascata: design, aprovação, publicação.",
@@ -836,10 +881,18 @@ function gerarResultado() {
     <div class="sol-images-wrapper">
       <h3 class="title-font sol-images-title">Por dentro da engenharia do S.O.L.</h3>
       <div class="sol-images-grid">
-        <div class="sol-image-placeholder"></div>
-        <div class="sol-image-placeholder"></div>
-        <div class="sol-image-placeholder"></div>
-        <div class="sol-image-placeholder"></div>
+        <div class="sol-image-placeholder">
+          <img src="dashboard.png" alt="Dashboard S.O.L">
+        </div>
+        <div class="sol-image-placeholder">
+          <img src="cronograma.png" alt="Cronograma S.O.L">
+        </div>
+        <div class="sol-image-placeholder">
+          <img src="processos.png" alt="Processos S.O.L">
+        </div>
+        <div class="sol-image-placeholder">
+          <img src="indicadores.png" alt="Indicadores S.O.L">
+        </div>
       </div>
     </div>
 
